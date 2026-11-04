@@ -210,7 +210,7 @@ function passwordMethod() {
       type: "text",
       key: "username",
       message: "SCNet 用户名 / 手机号 / 邮箱",
-      placeholder: "例如 my-account",
+      placeholder: "例如 你的用户名",
       validate: (value) => (typeof value !== "string" || !value.trim() ? "请输入用户名" : undefined),
     },
     {
