@@ -1,7 +1,7 @@
 {
   "name": "scnet-client-auth",
   "version": "0.2.0",
-  "description": "超算互联网「计算服务」客户端 for Magpie: reuse the desktop client's login, all 30 models with 1M context, streaming and tool calls.",
+  "description": "超算互联网「计算服务」客户端 for Magpie: reuse the desktop client's login and all 30 models. Not Token Plan; no quota view.",
   "type": "module",
   "main": "./index.mjs",
   "magpie": {

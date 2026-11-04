@@ -5,12 +5,21 @@ This file is for coding agents working in this repository. Humans read
 
 ## Project
 
-- Magpie plugin for the SCNet 计算服务 desktop client.
+- Magpie plugin for the **超算互联网「计算服务」客户端** (scnet-client;
+  `计算服务.exe`; data in `%USERPROFILE%\.sclaw\agent`).
 - Provider id: `scnet-client`
 - Upstream: `https://api.scnet.cn/api/llm/v1` (OpenAI Chat Completions)
 - 30 models in `models.mjs`; generated from the client's `models.json`.
 - Only `scnet-client/SCNet-Max` is usable without balance on the current key;
   other models may return `Insufficient Balance`.
+
+### Not Token Plan
+
+- This is **not** SCNet Token Plan. Token Plan uses `sk-tp-` keys and shows
+  Credits through the console; its plugin is `bbingz/scnet-auth`.
+- This plugin reverse-proxies the 「计算服务」 desktop client, uses its `sk-`
+  key, and has **no quota/credits API**. Do not add quota claims to the README.
+
 
 ## Login decision tree
 

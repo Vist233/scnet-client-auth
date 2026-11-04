@@ -1,6 +1,9 @@
-# SCNet 计算服务 · Magpie 插件
+# 超算互联网「计算服务」客户端 · Magpie 插件
 
-让 Magpie 使用「超算互联网 · 计算服务」账号，接入 30 个模型（SCNet-Max、DeepSeek、Kimi、GLM、Qwen 等）。
+把 **超算互联网「计算服务」客户端**（`scnet-client` / `计算服务.exe`）的登录接入 Magpie，反向代理它的 30 个模型（SCNet-Max、DeepSeek、Kimi、GLM、Qwen 等）。
+
+> **不是 SCNet Token Plan。**  
+> Token Plan 使用 `sk-tp-` Key，能在控制台查看 Credits；本插件反代的是「计算服务」客户端，使用它的 `sk-` Key，**不支持查看额度**。需要 Token Plan 请用 [`bbingz/scnet-auth`](https://github.com/bbingz/scnet-auth)。
 
 ## 安装
 
@@ -45,6 +48,11 @@ Magpie → 供应商 → 超算互联网 · 计算服务 → 登录
 - 模型：`scnet-client/SCNet-Max`
 - 当前 Key 只有 `SCNet-Max` 免费可用；其他模型可能返回 `Insufficient Balance`
 - Agent 脚本说明见 [AGENTS.md](AGENTS.md)
+
+## 为什么有这个插件
+
+- Token Plan 插件不覆盖「计算服务」客户端；两者是不同的产品、Key 类型和额度体系。
+- 本插件只复用「计算服务」客户端的登录和模型，不读取额度，也不走 Token Plan。
 
 ## License
 
