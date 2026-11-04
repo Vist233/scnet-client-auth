@@ -13,8 +13,8 @@
     "login.mjs",
     "models.mjs",
     "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "AGENTS.md"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs"
