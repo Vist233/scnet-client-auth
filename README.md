@@ -160,8 +160,10 @@ scnet-client/Kimi-K3
 
 ## Agent 为主
 
-- 登录页：`bash scripts/open-login.sh`（Agent 可直接执行，自动在 Windows 打开浏览器）
-- 登录状态：`bash scripts/status-local.sh`
+- 登录：`bash scripts/agent-login.sh`（Agent 可直接执行；自动打开 providers 页面，不碰密码/验证码）
+- 等待登录：`bash scripts/agent-login.sh --wait 300`（Agent 可后台等待，登录成功后自动返回）
+- 验证：`bash scripts/status-local.sh`
+- 退出测试：`bash scripts/logout-local.sh`
 - 账号密码：一步完成；手机号：先输手机号 → 发短信 → 同一个弹窗里出现 **Code** 输入框，两步完成
 - 登录后 Agent 走网关：
 
@@ -173,6 +175,19 @@ scnet-client/Kimi-K3
 
 - 如果 Magpie 和 Agent 在同一个配置里，也可以用 `magpie <agent> scnet-client/SCNet-Max` 直接改 Agent 的模型
 - 手机号输入框只显示本地号码；`+86` 只在请求内部自动补，不会显示在前端
+
+### Agent 登录约定
+
+- 用户在对话里给了 **用户名 + 密码**：
+  `printf '%s' '{"username":"...","password":"..."}' | node scripts/chat-login.mjs password`
+- 用户给了 **手机号**：
+  `node scripts/chat-login.mjs sms --send --phone 13200000000`
+  用户把收到的验证码发来后：
+  `node scripts/chat-login.mjs sms --code 123456`
+- 用户只说“打开登录页”/没给凭据：
+  `bash scripts/agent-login.sh`
+- `chat-login.mjs` 登录成功后通过 Magpie 的 `/api/plugin-signin` 自动写回 Key，不需要再复制 Key；输出只显示 Key 前后几位。
+- 密码/验证码会出现在对话里；不想在聊天里发凭据时，用 `agent-login.sh` 打开原生页面自己输入。
 
 ## 额度显示
 

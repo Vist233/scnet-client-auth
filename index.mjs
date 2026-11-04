@@ -342,11 +342,19 @@ function manualMethod() {
         const error = prompt.validate?.(inputs[prompt.key])
         if (error) return { type: "failed", error }
       }
+      const extra = {}
+      for (const key of ["source", "userId", "userName", "phone"]) {
+        const value = inputs[key]
+        if (typeof value === "string" && value.trim()) extra[key] = value.trim()
+      }
       return {
         type: "success",
         metadata: {
           email: `超算互联网 · ${inputs.label.trim()}`,
-          source: "manual",
+          source: extra.source || "manual",
+          ...(extra.userId ? { userId: extra.userId } : {}),
+          ...(extra.userName ? { userName: extra.userName } : {}),
+          ...(extra.phone ? { phone: extra.phone } : {}),
           models: modelIds(SCNET_MODELS),
         },
       }
