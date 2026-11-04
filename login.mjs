@@ -152,8 +152,10 @@ export function normalizePhone(input) {
 }
 
 export function maskPhone(phone) {
-  const text = String(phone ?? "")
-  return text.length >= 7 ? `${text.slice(0, 4)}****${text.slice(-4)}` : text
+  // Show the local number only; the +86 is an implementation detail.
+  const digits = String(phone ?? "").replace(/[^\d]/g, "")
+  const local = digits.length > 11 && digits.startsWith("86") ? digits.slice(2) : digits
+  return local.length >= 7 ? `${local.slice(0, 3)}****${local.slice(-4)}` : local
 }
 
 export async function isNeedCaptcha(jar) {

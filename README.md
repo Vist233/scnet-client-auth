@@ -93,7 +93,7 @@ magpie plugin login scnet-client
 除了自动读取和手动 Key，插件还提供两种在线登录：
 
 - **账号密码登录**：用户名 + 密码；如果 SCNet 要求图形验证码，会返回验证码图片并让你输入。
-- **手机号验证码登录**：输入手机号 → 收到短信 → 在 Magpie 里输入验证码。
+- **手机号验证码登录**：输入手机号 → 收到短信 → 在 Magpie 里输入验证码。输入框只显示本地号码；请求时自动补 `+86`，界面上不显示国家码。
 
 登录成功后插件会自动调用 `POST /acx/llm/api-key/createActivityApiKey` 获取/创建 `sk-` Key，并保存到 Magpie；不需要再手动复制 Key。
 
@@ -156,6 +156,22 @@ scnet-client/Kimi-K3
 | `Qwen3.8-Max` | 1,048,576 | 131,072 | 视觉 |
 
 完整列表见 `models.mjs`（由客户端 `models.json` 生成）。
+
+## Agent 为主
+
+- 登录页：`bash scripts/open-login.sh`（Agent 可直接执行，自动在 Windows 打开浏览器）
+- 登录状态：`bash scripts/status-local.sh`
+- 账号密码：一步完成；手机号：先输手机号 → 发短信 → 同一个弹窗里出现 **Code** 输入框，两步完成
+- 登录后 Agent 走网关：
+
+  ```text
+  base_url  http://127.0.0.1:3425/v1
+  model     scnet-client/SCNet-Max
+  api_key   magpie
+  ```
+
+- 如果 Magpie 和 Agent 在同一个配置里，也可以用 `magpie <agent> scnet-client/SCNet-Max` 直接改 Agent 的模型
+- 手机号输入框只显示本地号码；`+86` 只在请求内部自动补，不会显示在前端
 
 ## 额度显示
 

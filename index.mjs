@@ -281,7 +281,7 @@ function smsMethod() {
     {
       type: "text",
       key: "phone",
-      message: "手机号（默认 +86）",
+      message: "手机号",
       placeholder: "13200000000",
       validate: (value) => (typeof value !== "string" || !value.trim() ? "请输入手机号" : undefined),
     },
