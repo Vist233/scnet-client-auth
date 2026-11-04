@@ -108,6 +108,8 @@ SCNET_COOKIE='Token=...; ...' node scripts/check-cookie.mjs
 
 脚本只把 Cookie 发给 `www.scnet.cn`，不会打印 Cookie；它会显示网页账号和客户端 `config.json` 里的 `userInfo`（id / userName / 姓名 / 手机号掩码），并给出是否同一个账号的结论。
 
+实测（2026-11-04）：chatbot 的 Cookie 与客户端账号一致，但用它访问 `/acx/user/users/cluster-user-detail` 返回 401。也就是说 **chatbot 的 Token 只能读用户信息，不能管理计算服务 Key**；要拿 `sk-` Key 还是走账号密码/短信登录，或直接复用客户端的 `.sclaw`。
+
 ### Docker / 远程 Magpie
 
 容器里读不到 Windows 的 `.sclaw`，把目录挂进去：
