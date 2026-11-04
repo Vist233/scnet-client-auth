@@ -16,8 +16,9 @@
 - 30 个模型全部暴露到 Magpie（`magpie provider models scnet-client <30 个 ID>`）
 - `SCNet-Max` 非流式、流式（SSE，含 `reasoning_content` + `content`）均通过
 - 当前这份 key 对其他模型返回 `Insufficient Balance`：实测 `DeepSeek-V4.1-Flash-1017`、`Qwen3.8-Flash`、`GLM-5.3-Flash` 都一样。**免费额度目前只覆盖 `SCNet-Max`**；其他模型要等账户有余额或在 App 里确认套餐。
-- 账号密码登录：RSA 加密格式已被服务端接受（假账号返回 `user not exits or password is not correct`，不是 `password decryption failed`）；真实账号待验证。
-- 手机号验证码登录：接口已接通，待真实手机收码验证。
+- 账号密码登录：已验证，登录后 Key 与客户端 `.sclaw` 一致。
+- 手机号验证码登录：已验证（手机号 → 短信码两步），登录后 Key 与账号密码/客户端 `.sclaw` 一致。
+- 客户端读取、账号密码、手机号三条路径拿到的都是同一把 `sk-` Key（`sk-…`，43 位）。
 - `scripts/check-cookie.mjs` 可对比网页 Cookie 与客户端 `config.json` 里的账号是否一致。
 
 ## 它从哪里读登录
