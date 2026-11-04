@@ -11,6 +11,17 @@
 import { readFileSync } from "node:fs"
 import { detectLocalLogin } from "./credentials.mjs"
 import { SCNET_MODELS } from "./models.mjs"
+import {
+  CookieJar,
+  finishLogin,
+  getCaptcha,
+  isNeedCaptcha,
+  loginPassword,
+  loginSmsCode,
+  maskPhone,
+  normalizePhone,
+  sendSmsCode,
+} from "./login.mjs"
 
 const ID = "scnet-client"
 const NPM = "@ai-sdk/openai-compatible"
@@ -90,7 +101,7 @@ export async function SCNetClientPlugin() {
     auth: {
       provider: ID,
       icon: ICON,
-      methods: [autoMethod(), manualMethod()],
+      methods: [autoMethod(), manualMethod(), passwordMethod(), smsMethod()],
       async loader(getAuth) {
         requireKey(await getAuth())
         return {
@@ -186,6 +197,118 @@ function autoMethod() {
             type: "failed",
             error:
               "未找到计算服务客户端的登录信息。请确认已安装并登录「计算服务」，或设置 SCNET_SCLAW_DIR 指向 .sclaw/agent；也可以改用手动 Key。",
+          }
+        },
+      }
+    },
+  }
+}
+
+function passwordMethod() {
+  const prompts = [
+    {
+      type: "text",
+      key: "username",
+      message: "SCNet 用户名 / 手机号 / 邮箱",
+      placeholder: "例如 my-account",
+      validate: (value) => (typeof value !== "string" || !value.trim() ? "请输入用户名" : undefined),
+    },
+    {
+      type: "password",
+      key: "password",
+      message: "SCNet 登录密码",
+      validate: (value) => (typeof value !== "string" || !value ? "请输入密码" : undefined),
+    },
+  ]
+  return {
+    type: "oauth",
+    label: "账号密码登录",
+    prompts,
+    async authorize(inputs = {}) {
+      for (const prompt of prompts) {
+        const error = prompt.validate?.(inputs[prompt.key])
+        if (error) throw new Error(error)
+      }
+      const jar = new CookieJar()
+      const needsCaptcha = await isNeedCaptcha(jar)
+      if (needsCaptcha) {
+        const captcha = await getCaptcha(jar)
+        return {
+          url: captcha.image,
+          opened: false,
+          method: "code",
+          instructions: "需要图形验证码。验证码图片已附加在链接中，请输入图片里的验证码。",
+          async callback(code) {
+            try {
+              await loginPassword({
+                username: inputs.username.trim(),
+                password: inputs.password,
+                captcha: code,
+                captchaKey: captcha.key,
+                jar,
+              })
+              return await finishLogin(jar, { source: "password" })
+            } catch (error) {
+              return { type: "failed", error: error.message }
+            }
+          },
+        }
+      }
+      return {
+        url: "",
+        opened: false,
+        method: "auto",
+        instructions: "正在登录 SCNet 并获取计算服务 Key…",
+        async callback() {
+          try {
+            await loginPassword({
+              username: inputs.username.trim(),
+              password: inputs.password,
+              jar,
+            })
+            return await finishLogin(jar, { source: "password" })
+          } catch (error) {
+            return { type: "failed", error: error.message }
+          }
+        },
+      }
+    },
+  }
+}
+
+function smsMethod() {
+  const prompts = [
+    {
+      type: "text",
+      key: "phone",
+      message: "手机号（默认 +86）",
+      placeholder: "13200000000",
+      validate: (value) => (typeof value !== "string" || !value.trim() ? "请输入手机号" : undefined),
+    },
+  ]
+  return {
+    type: "oauth",
+    label: "手机号验证码登录",
+    prompts,
+    async authorize(inputs = {}) {
+      const phone = normalizePhone(inputs.phone)
+      const jar = new CookieJar()
+      try {
+        await sendSmsCode(phone, jar)
+      } catch (error) {
+        throw new Error(`发送验证码失败：${error.message}`)
+      }
+      return {
+        url: "",
+        opened: false,
+        method: "code",
+        instructions: `验证码已发送到 ${maskPhone(phone)}，请输入短信验证码。`,
+        async callback(code) {
+          try {
+            await loginSmsCode(code, jar)
+            return await finishLogin(jar, { source: "sms", phone })
+          } catch (error) {
+            return { type: "failed", error: error.message }
           }
         },
       }

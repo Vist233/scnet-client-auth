@@ -16,6 +16,9 @@
 - 30 个模型全部暴露到 Magpie（`magpie provider models scnet-client <30 个 ID>`）
 - `SCNet-Max` 非流式、流式（SSE，含 `reasoning_content` + `content`）均通过
 - 当前这份 key 对其他模型返回 `Insufficient Balance`：实测 `DeepSeek-V4.1-Flash-1017`、`Qwen3.8-Flash`、`GLM-5.3-Flash` 都一样。**免费额度目前只覆盖 `SCNet-Max`**；其他模型要等账户有余额或在 App 里确认套餐。
+- 账号密码登录：RSA 加密格式已被服务端接受（假账号返回 `user not exits or password is not correct`，不是 `password decryption failed`）；真实账号待验证。
+- 手机号验证码登录：接口已接通，待真实手机收码验证。
+- `scripts/check-cookie.mjs` 可对比网页 Cookie 与客户端 `config.json` 里的账号是否一致。
 
 ## 它从哪里读登录
 
@@ -86,6 +89,24 @@ CLI：
 ```sh
 magpie plugin login scnet-client
 ```
+
+除了自动读取和手动 Key，插件还提供两种在线登录：
+
+- **账号密码登录**：用户名 + 密码；如果 SCNet 要求图形验证码，会返回验证码图片并让你输入。
+- **手机号验证码登录**：输入手机号 → 收到短信 → 在 Magpie 里输入验证码。
+
+登录成功后插件会自动调用 `POST /acx/llm/api-key/createActivityApiKey` 获取/创建 `sk-` Key，并保存到 Magpie；不需要再手动复制 Key。
+
+### 网页 Cookie 与客户端账号是否同一个
+
+`www.scnet.cn` 的网页登录用的是控制台 Cookie，计算服务用的是 `sk-` 推理 Key，两者不是同一种凭据；它们可能属于同一个账号。用这个脚本可以对比：
+
+```sh
+# 从浏览器 DevTools → Network → 任意请求 → Request Headers 复制 Cookie 的值
+SCNET_COOKIE='Token=...; ...' node scripts/check-cookie.mjs
+```
+
+脚本只把 Cookie 发给 `www.scnet.cn`，不会打印 Cookie；它会显示网页账号和客户端 `config.json` 里的 `userInfo`（id / userName / 姓名 / 手机号掩码），并给出是否同一个账号的结论。
 
 ### Docker / 远程 Magpie
 
